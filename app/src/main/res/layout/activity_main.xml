@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.wiser.lrc.LrcView
+        android:id="@+id/lrc_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#AA000000"
+        app:lrcColor="@color/colorPrimary"
+        app:lrcEmptyLrcText="加载失败，歌词未显示"
+        app:lrcLimitLines="11"
+        app:lrcMode="KARAOKE"
+        app:lrcPlayColor="@color/colorAccent"
+        app:lrcPlaySrc="@mipmap/lrc_play"
+        app:lrcTextSize="20sp"
+        app:lrcTimeLineColor="#ffff00"
+        app:lrcTimeTextColor="#00ffff"
+        app:lrcTimeTextSize="12sp" />
+</LinearLayout>

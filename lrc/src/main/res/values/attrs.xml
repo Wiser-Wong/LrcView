@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 歌词-->
+    <declare-styleable name="LrcView">
+        <attr name="lrcMode" format="enum">
+            <enum name="KARAOKE" value="1" />
+        </attr>
+        <attr name="lrcPlayColor" format="color|reference" />
+        <attr name="lrcColor" format="color|reference" />
+        <attr name="lrcEmptyLrcText" format="string" />
+        <attr name="lrcTextSize" format="dimension|reference" />
+        <attr name="lrcLimitLines" format="integer" />
+        <attr name="lrcTimeTextSize" format="dimension|reference" />
+        <attr name="lrcTimeTextColor" format="color|reference" />
+        <attr name="lrcTimeLineColor" format="color|reference" />
+        <attr name="lrcPlaySrc" format="reference" />
+    </declare-styleable>
+</resources>
