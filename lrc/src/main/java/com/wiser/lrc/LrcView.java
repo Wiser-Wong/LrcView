@@ -82,6 +82,8 @@ public class LrcView extends View {
 
 	private int					limitLines					= 9;						// 限制显示的行数最小
 
+	private int					heightLightItems			= 3;						// 限制显示的行数最小
+
 	private String				emptyLrc;												// 未查询到歌词文案
 
 	private static final int	NORMAL						= 0;						// 默认高亮展示播放中歌词
@@ -158,6 +160,8 @@ public class LrcView extends View {
 
 	private int					currentAlpha;											// 当前播放位置透明度 为了同步卡拉OK模式滑动透明度变化
 
+	private Rect				rect;													// 为了获取歌词宽度矩阵
+
 	public LrcView(Context context) {
 		super(context);
 		init(context, null);
@@ -193,6 +197,7 @@ public class LrcView extends View {
 		int leftLineSrcId = typedArray.getResourceId(R.styleable.LrcView_lrcLeftLineSrc, -1);
 		int rightLineSrcId = typedArray.getResourceId(R.styleable.LrcView_lrcRightLineSrc, -1);
 		lrcMode = typedArray.getInt(R.styleable.LrcView_lrcMode, NORMAL);
+		heightLightItems = typedArray.getInt(R.styleable.LrcView_lrcHeightLightItems, heightLightItems);
 		isTranslateLrcDrawColor = typedArray.getBoolean(R.styleable.LrcView_lrcTranslateIsDrawColor, isTranslateLrcDrawColor);
 		translateLrcColor = typedArray.getColor(R.styleable.LrcView_lrcTranslateColor, translateLrcColor);
 		lrcTimeDirectionMode = typedArray.getInt(R.styleable.LrcView_lrcTimeDirectionMode, LEFT);
@@ -210,6 +215,8 @@ public class LrcView extends View {
 			playBitmap = BitmapFactory.decodeResource(getResources(), playSrcId);
 		}
 
+		rect = new Rect();
+
 		// 计算文本高度
 		fontMetrics = lrcPaint.getFontMetrics();
 
@@ -221,6 +228,9 @@ public class LrcView extends View {
 		mMinimumFlingVelocity = ViewConfiguration.get(context).getScaledMinimumFlingVelocity();
 
 		lrcHandler = new LrcHandler(this);
+
+		// 最大显示5条高亮 否则根据行数计算高亮条数
+		if (limitLines / 2 < heightLightItems) heightLightItems = limitLines / 2;
 	}
 
 	// 初始化画笔
@@ -361,8 +371,7 @@ public class LrcView extends View {
 				weights[2] = 1;
 				break;
 		}
-		String time = getMinuteSecondStrForLong(currentDuration);
-		float timeWidth = timePaint.measureText(time);
+		float timeWidth = getTextWidth(timePaint, getMinuteSecondStrForLong(currentDuration));
 		float playWidth = 0;
 		if (playBitmap != null) playWidth = playBitmap.getWidth();
 		switch (mode) {
@@ -428,7 +437,7 @@ public class LrcView extends View {
 			// 获取歌词高度
 			lrcTextH = fontMetrics.bottom - fontMetrics.top;
 			// 歌词真实高度
-			lrcTextRealH = getTextValue(lrcPaint, emptyLrc)[1];
+			lrcTextRealH = getTextHeight(lrcPaint, emptyLrc);
 			// 计算歌词间距离Padding
 			calculatePadding(getMeasuredHeight(), lrcTextH);
 		}
@@ -467,7 +476,7 @@ public class LrcView extends View {
 	}
 
 	// 画歌词卡拉OK
-	private void canvasLrcBitmap(Canvas canvas, LrcBean lrcBean, int currentPosition) {
+	private void canvasLrcKaraoke(Canvas canvas, LrcBean lrcBean, int currentPosition) {
 		canvas.save();
 		// 第一条歌词偏移出去的高度 只有第一条是多行的情况才会有偏移
 		float firstItemOffset = (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() + (lrcBean.lrcTranslateLineList == null ? 0 : lrcBean.lrcTranslateLineList.size()) - 1)
@@ -476,7 +485,7 @@ public class LrcView extends View {
 		// 当前绘制的折行歌词条目
 		int currentBreakLineIndex = 0;
 		// 歌词宽度
-		float lrcTextW = lrcPaint.measureText(lrcBean.lrc);
+		float lrcTextW = getTextWidth(lrcPaint, lrcBean.lrc);
 		// 卡拉OK移动的距离
 		float goWidth = calculateGoWidth(lrcBean, lrcTextW, currentPosition);
 		// 单行歌词有换行的歌词判断
@@ -509,9 +518,9 @@ public class LrcView extends View {
 				// null);
 				// textBitmap.recycle();
 				// 裁剪一个矩形用来绘制已经唱的歌词
-				canvas.clipRect((getMeasuredWidth() - lrcPaint.measureText(list.get(currentBreakLineIndex))) / 2,
+				canvas.clipRect((getMeasuredWidth() - getTextWidth(lrcPaint, list.get(currentBreakLineIndex))) / 2,
 						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - lrcTextH + currentBreakLineIndex * lrcTextH - firstItemOffset,
-						(getMeasuredWidth() - lrcPaint.measureText(list.get(currentBreakLineIndex))) / 2 + (goWidth - currentBreakLineIndex * lrcMaxLength),
+						(getMeasuredWidth() - getTextWidth(lrcPaint, list.get(currentBreakLineIndex))) / 2 + (goWidth - currentBreakLineIndex * lrcMaxLength),
 						(float) getMeasuredHeight() / 2 + lrcTextH / 2 + calculateOffset(currentPosition) + currentBreakLineIndex * lrcTextH - firstItemOffset);
 				canvas.drawText(list.get(currentBreakLineIndex), (float) getMeasuredWidth() / 2,
 						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) + currentBreakLineIndex * lrcTextH - firstItemOffset, lrcPaint);
@@ -551,7 +560,7 @@ public class LrcView extends View {
 		// 当前绘制的折行歌词条目
 		int currentBreakLineIndex = 0;
 		// 歌词宽度
-		float lrcTextW = lrcTranslatePaint.measureText(lrcBean.translateLrc);
+		float lrcTextW = getTextWidth(lrcTranslatePaint, lrcBean.translateLrc);
 		// 卡拉OK移动的距离
 		float goWidth = calculateGoWidth(lrcBean, lrcTextW, currentPosition);
 		// 单行歌词有换行的歌词判断
@@ -570,10 +579,10 @@ public class LrcView extends View {
 					}
 				}
 				// 裁剪一个矩形用来绘制已经唱的歌词
-				canvas.clipRect((getMeasuredWidth() - lrcTranslatePaint.measureText(list.get(currentBreakLineIndex))) / 2,
+				canvas.clipRect((getMeasuredWidth() - getTextWidth(lrcTranslatePaint, list.get(currentBreakLineIndex))) / 2,
 						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - lrcTextH + currentBreakLineIndex * lrcTextH - firstItemOffset
 								+ (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH),
-						(getMeasuredWidth() - lrcTranslatePaint.measureText(list.get(currentBreakLineIndex))) / 2 + (goWidth - currentBreakLineIndex * lrcMaxLength),
+						(getMeasuredWidth() - getTextWidth(lrcTranslatePaint, list.get(currentBreakLineIndex))) / 2 + (goWidth - currentBreakLineIndex * lrcMaxLength),
 						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) + currentBreakLineIndex * lrcTextH - firstItemOffset
 								+ (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH));
 				canvas.drawText(list.get(currentBreakLineIndex), (float) getMeasuredWidth() / 2, (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent
@@ -603,7 +612,7 @@ public class LrcView extends View {
 		lrcPaint.setAlpha(currentAlpha);
 		LrcBean lrcBean = lrcBeans.get(currentPosition);
 		if (lrcBean == null) return;
-		canvasLrcBitmap(canvas, lrcBean, currentPosition);
+		canvasLrcKaraoke(canvas, lrcBean, currentPosition);
 		if (isTranslateLrcDrawColor) canvasTranslateLrcLrcBitmap(canvas, lrcBean, currentPosition);
 	}
 
@@ -622,10 +631,6 @@ public class LrcView extends View {
 			lrcTranslatePaint.setColor(translateLrcColor);
 			// 设置正在播放位置颜色
 			if (lrcMode == NORMAL && i == currentPosition) lrcPaint.setColor(playLrcColor);
-			// 高亮的条数
-			int heightLightItems = 3;
-			// 最大显示5条高亮 否则根据行数计算高亮条数
-			if (limitLines / 2 < heightLightItems) heightLightItems = limitLines / 2;
 			// 当前滑动到的位置
 			int position = calculateDraggingPosition();
 			// 上半部分内容充满情况
@@ -675,7 +680,7 @@ public class LrcView extends View {
 			// 单行歌词超出屏幕处理换行显示
 			if (lrcBean.lrcBreakLineList == null || lrcBean.lrcBreakLineList.size() == 0) continue;
 			// 为单行歌词超出宽度进行折行添加新歌词之间的的padding
-			if (i > 0 && lrcPaint.measureText(lrcBeans.get(i - 1).lrc) > lrcMaxLength) {
+			if (i > 0 && getTextWidth(lrcPaint, lrcBeans.get(i - 1).lrc) > lrcMaxLength) {
 				addPadding += multiLinesHeight - lrcTextH;
 			}
 			// 为单行翻译歌词超出宽度进行折行添加新歌词之间的的padding
@@ -780,14 +785,14 @@ public class LrcView extends View {
 		int draggingPosition = calculateDraggingPosition();
 		float playWidth = 0;
 		if (playBitmap != null) playWidth = playBitmap.getWidth();
-		// 时间文本
+		// 时间
 		String time = getMinuteSecondStrForLong(lrcBeans.get(draggingPosition).startTime);
 		// 时间文本宽度
-		float timeWidth = timePaint.measureText(time);
+		float timeWidth = getTextWidth(timePaint, time);
 		switch (lrcTimeDirectionMode) {
 			case LEFT:// 左侧时间右侧播放按钮
 				// 画时间
-				canvas.drawText(time, timeWidth / 2 + timeLinePadding, (float) getMeasuredHeight() / 2 + getTextValue(timePaint, time)[1] / 2 - 4 + mOffset, timePaint);
+				canvas.drawText(time, timeWidth / 2 + timeLinePadding, (float) getMeasuredHeight() / 2 + getTextHeight(timePaint, time) / 2 - 4 + mOffset, timePaint);
 				// 左线颜色
 				if (lrcLeftLineMode == CANVAS_LEFT_LINE_COLOR) {
 					// 画左线
@@ -825,7 +830,7 @@ public class LrcView extends View {
 				break;
 			case RIGHT:// 左侧播放按钮右侧时间
 				// 画时间
-				canvas.drawText(time, getMeasuredWidth() - timeWidth / 2 - timeLinePadding, (float) getMeasuredHeight() / 2 + getTextValue(timePaint, time)[1] / 2 + mOffset, timePaint);
+				canvas.drawText(time, getMeasuredWidth() - timeWidth / 2 - timeLinePadding, (float) getMeasuredHeight() / 2 + getTextHeight(timePaint, time) / 2 + mOffset, timePaint);
 				// 左线颜色
 				if (lrcLeftLineMode == CANVAS_LEFT_LINE_COLOR) {
 					// 画左线
@@ -865,7 +870,7 @@ public class LrcView extends View {
 	// 如果字符串超过最大宽度则换行存储数据
 	private List<String> getStrings(String text, float width) {
 		if (text == null || "".equals(text)) return null;
-		int line = (int) Math.ceil(getTextValue(lrcPaint, text)[0] / width);
+		int line = (int) Math.ceil(getTextWidth(lrcPaint, text) / width);
 		if (line == 0) return null;
 		List<String> texts = new ArrayList<>();
 		if (line == 1) {
@@ -878,7 +883,7 @@ public class LrcView extends View {
 			StringBuilder newText = new StringBuilder();
 			for (int j = index; j < text.length(); j++) {
 				newText.append(text.charAt(j));
-				if (getTextValue(lrcPaint, newText.toString())[0] > width) {
+				if (getTextWidth(lrcPaint, newText.toString()) > width) {
 					index = j;
 					newText.deleteCharAt(newText.length() - 1);
 					break;
@@ -897,15 +902,18 @@ public class LrcView extends View {
 		return texts;
 	}
 
-	// 获取文字宽高
-	private float[] getTextValue(Paint paint, String text) {
-		float[] values = new float[2];
-		if (text == null || "".equals(text)) return values;
-		Rect rect = new Rect();
+	// 获取文字宽
+	private float getTextWidth(Paint paint, String text) {
+		if (text == null || "".equals(text)) return 0;
 		paint.getTextBounds(text, 0, text.length(), rect);
-		values[0] = rect.width();
-		values[1] = rect.height();
-		return values;
+		return rect.width();
+	}
+
+	// 获取文字高
+	private float getTextHeight(Paint paint, String text) {
+		if (text == null || "".equals(text)) return 0;
+		paint.getTextBounds(text, 0, text.length(), rect);
+		return rect.height();
 	}
 
 	/**
@@ -1047,10 +1055,8 @@ public class LrcView extends View {
 	private void play(float upX, float upY) {
 		if (playBitmap == null) return;
 		if (lrcBeans == null || lrcBeans.size() == 0) return;
-		// 时间文本
-		String time = getMinuteSecondStrForLong(lrcBeans.get(0).startTime);
 		// 时间文本宽度
-		float timeWidth = timePaint.measureText(time);
+		float timeWidth = getTextWidth(timePaint, getMinuteSecondStrForLong(lrcBeans.get(0).startTime));
 		float playWidth = playBitmap.getWidth();
 		float leftLimitX;
 		if (playWidth >= timeWidth) {

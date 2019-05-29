@@ -35,6 +35,7 @@
         app:lrcTimeTextColor="#ffff00"
         app:lrcTimeTextSize="12sp"
         app:lrcTranslateColor="#CCCCCC"
-        app:lrcTranslateIsDrawColor="true" />
+        app:lrcTranslateIsDrawColor="true"
+        app:lrcHeightLightItems="1"/>
 
 </FrameLayout>
