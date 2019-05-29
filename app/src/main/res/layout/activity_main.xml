@@ -31,6 +31,7 @@
         app:lrcTimeLineColor="#CAFF70"
         app:lrcTimeLineHeight="1dp"
         app:lrcTimeLineLength="40dp"
+        app:lrcRightLineSrc="@drawable/line"
         app:lrcTimeLinePadding="10dp"
         app:lrcTimeTextColor="#ffff00"
         app:lrcTimeTextSize="12sp"
