@@ -44,7 +44,7 @@
 ### 正常歌词
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc7.jpg)
 
-### 音译歌词
+### 音译歌词 可设置音译歌词颜色 以及 是否与歌词模式（卡拉OK 对应显示）
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc1.jpg)
 
 ### 按下显示播放线
