@@ -300,7 +300,7 @@ public class LrcView extends View {
 		lrcBeans = LrcParseTool.parseLrc(lrc);
 		if (lrcBeans != null && lrcBeans.size() > 0) {
 			for (int i = 0; i < lrcBeans.size(); i++) {
-				lrcBeans.get(i).translateLrc = "I am translate lrc";
+//				lrcBeans.get(i).translateLrc = "I am translate lrc";
 			}
 		}
 	}
@@ -666,7 +666,9 @@ public class LrcView extends View {
 			if (lrcBean.lrcTranslateLineList != null) {
 				multiLinesTranslateHeight = lrcBean.lrcTranslateLineList.size() * lrcTextH;
 				// 同步歌词音译歌词绘制播放颜色
-				if (isTranslateLrcDrawColor && i == currentPosition) lrcTranslatePaint.setColor(playLrcColor);
+				if (isTranslateLrcDrawColor && i == currentPosition) {
+					if (lrcMode == NORMAL) lrcTranslatePaint.setColor(playLrcColor);
+				}
 				// 翻译单行不折行的文本绘制
 				if (lrcBean.lrcTranslateLineList.size() == 1) {
 					if (lrcBean.translateLrc != null && !"".equals(lrcBean.translateLrc)) canvas.drawText(lrcBean.translateLrc, width / 2,
