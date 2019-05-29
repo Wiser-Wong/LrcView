@@ -21,7 +21,7 @@ public class LrcParseTool {
 		lrc = lrc.replaceAll("&#58;", ":").replaceAll("&#10;", "\n").replaceAll("&#46;", ".").replaceAll("&#32;", " ").replaceAll("&#45;", "-").replaceAll("&#13;", "\r").replaceAll("&#39;", "'")
 				.replaceAll("null", "");
 		List<LrcBean> lrcBeans = new ArrayList<>();
-		if (lrc == null || "".equals(lrc)) return lrcBeans;
+		if ("".equals(lrc)) return lrcBeans;
 		String[] split = lrc.split("\n");
 		for (int i = 0; i < split.length; i++) {
 			// 带时间以及歌词的内容

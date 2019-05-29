@@ -3,7 +3,12 @@
     <!-- 歌词-->
     <declare-styleable name="LrcView">
         <attr name="lrcMode" format="enum">
+            <enum name="NORMAL" value="0" />
             <enum name="KARAOKE" value="1" />
+        </attr>
+        <attr name="lrcTimeDirectionMode" format="enum">
+            <enum name="LEFT" value="2" />
+            <enum name="RIGHT" value="3" />
         </attr>
         <attr name="lrcPlayColor" format="color|reference" />
         <attr name="lrcColor" format="color|reference" />
@@ -13,6 +18,17 @@
         <attr name="lrcTimeTextSize" format="dimension|reference" />
         <attr name="lrcTimeTextColor" format="color|reference" />
         <attr name="lrcTimeLineColor" format="color|reference" />
+        <attr name="lrcLineStartColor" format="color|reference" />
+        <attr name="lrcLineCenterColor" format="color|reference" />
+        <attr name="lrcLineEndColor" format="color|reference" />
+        <attr name="lrcTimeLinePadding" format="dimension|reference" />
+        <attr name="lrcTimeLineLength" format="dimension|reference" />
+        <attr name="lrcTimeLineHeight" format="dimension|reference" />
+        <attr name="lrcIsDashLine" format="boolean" />
         <attr name="lrcPlaySrc" format="reference" />
+        <attr name="lrcLeftLineSrc" format="reference" />
+        <attr name="lrcRightLineSrc" format="reference" />
+        <attr name="lrcTranslateIsDrawColor" format="boolean" />
+        <attr name="lrcTranslateColor" format="color|reference" />
     </declare-styleable>
 </resources>

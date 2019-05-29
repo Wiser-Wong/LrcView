@@ -1,13 +1,13 @@
 package com.wiser.songlrcview;
 
-import android.os.Handler;
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import java.lang.ref.WeakReference;
 
 import com.wiser.lrc.LrcView;
 
-import java.lang.ref.WeakReference;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 
 /**
  * @author Wiser
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements LrcView.SeekListe
 
 	private final int		UPDATE_DURATION	= 11;
 
-	private LrcView			lrcView;
+	private LrcView lrcView;
 
 	private DurationHandler	handler;
 
@@ -68,11 +68,11 @@ public class MainActivity extends AppCompatActivity implements LrcView.SeekListe
 		lrcView = findViewById(R.id.lrc_view);
 
 		String lrc = "[00:00.00]海阔天空\n" + "[00:05.00]Beyond\n" + "[00:15.00]专辑：乐与怒\n" + "[00:18.00]\n" + "[01:43.00][00:19.00]今天我寒夜里看雪飘过 \n" + "[01:49.00][00:25.00]怀著冷却了的心窝飘远方 \n"
-				+ "[01:55.00][00:31.00]风雨里追赶 \n" + "[01:58.00][00:34.00]雾里分不清影踪 \n" + "[02:01.00][00:37.00]天空海阔你与我 \n" + "[02:05.00][00:40.00]可会变(谁没在变) \n" + "\n" + "[00:43.00]多少次迎著冷眼与嘲笑 \n"
-				+ "[00:50.00]从没有放弃过心中的理想 \n" + "[00:56.00]一刹那恍惚 \n" + "[00:59.00]若有所失的感觉 \n" + "[01:02.00]不知不觉已变淡 \n" + "[01:05.00]心里爱(谁明白我) \n" + "\n"
+				+ "[01:55.00][00:31.00]风雨里追赶 \n" + "[01:58.00][00:34.00]雾里分不清影踪 \n" + "[02:01.00][00:37.00]天空海阔你与我 \n" + "[02:05.00][00:40.00]可会变(谁没在变)\n" + "[00:43.00]多少次迎著冷眼与嘲笑 \n"
+				+ "[00:50.00]从没有放弃过心中的理想 \n" + "[00:56.00]一刹那恍惚 \n" + "[00:59.00]若有所失的感觉 \n" + "[01:02.00]不知不觉已变淡 \n" + "[01:05.00]心里爱(谁明白我) \n"
 				+ "[03:57.70][03:20.00][02:08.00][01:09.00]原谅我这一生不羁放纵爱自由 \n" + "[04:04.50][03:27.00][02:15.00][01:16.00]也会怕有一天会跌倒 \n"
-				+ "[04:10.85][03:46.00][03:33.00][02:21.00][01:22.00]被弃了理想谁人都可以 \n" + "[04:17.00][03:52.00][03:39.60][02:28.00][01:28.00]哪会怕有一天只你共我 \n" + "\n" + "[03:08.60]仍然自由自我 \n"
-				+ "[03:12.00]永远高唱我歌\n" + "[03:14.50]走遍千里\n";
+				+ "[04:10.85][03:46.00][03:33.00][02:21.00][01:22.00]被弃了理想谁人都可以 \n" + "[04:17.00][03:52.00][03:39.60][02:28.00][01:28.00]哪会怕有一天只你共我\n" + "[03:08.60]仍然自由自我 \n" + "[03:12.00]永远高唱我歌\n"
+				+ "[03:14.50]走遍千里\n";
 		lrcView.setLrc(lrc);
 		lrcView.setMaxDuration(maxDuration);
 		lrcView.setSeekListener(this);
