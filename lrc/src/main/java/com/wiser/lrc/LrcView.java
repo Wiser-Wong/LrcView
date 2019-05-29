@@ -298,11 +298,11 @@ public class LrcView extends View {
 	// 设置歌词
 	public void setLrc(String lrc) {
 		lrcBeans = LrcParseTool.parseLrc(lrc);
-		if (lrcBeans != null && lrcBeans.size() > 0) {
-			for (int i = 0; i < lrcBeans.size(); i++) {
-//				lrcBeans.get(i).translateLrc = "I am translate lrc";
-			}
-		}
+	}
+
+	// 设置歌词集合
+	public void setLrcBeans(List<LrcBean> lrcBeans) {
+		this.lrcBeans = lrcBeans;
 	}
 
 	// 设置总时间
@@ -417,13 +417,17 @@ public class LrcView extends View {
 	@Override protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
 		super.onLayout(changed, left, top, right, bottom);
 		if (isFirstAddTextLineList) {
-			lrcMaxLength = (int) (getMeasuredWidth() - 2 * (timePaint.measureText(getMinuteSecondStrForLong(currentDuration)) + 2 * timeLinePadding + timeLineLength)) + 10;
+			// 最大歌词长度
+			lrcMaxLength = getMeasuredWidth() / 2;
+			// 添加歌词折行集合
 			addLrcBreakLineList();
+			// 添加音译歌词折行集合
 			addLrcTranslateLineList();
+			// 第一次添加判断
 			isFirstAddTextLineList = false;
 			// 获取歌词高度
 			lrcTextH = fontMetrics.bottom - fontMetrics.top;
-			// 歌词真是高度
+			// 歌词真实高度
 			lrcTextRealH = getTextValue(lrcPaint, emptyLrc)[1];
 			// 计算歌词间距离Padding
 			calculatePadding(getMeasuredHeight(), lrcTextH);
@@ -450,20 +454,21 @@ public class LrcView extends View {
 	}
 
 	// 计算卡拉OK模式播放的宽度
-	private int calculateGoWidth(LrcBean lrcBean, float lrcTextW, int currentPosition) {
+	private float calculateGoWidth(LrcBean lrcBean, float lrcTextW, int currentPosition) {
 		if (lrcBean == null) return 0;
 		// 计算一行歌词播放中执行的宽度 来创建歌词Bitmap
-		int goWidth;
+		float goWidth;
 		if (currentPosition == lrcBeans.size() - 1) {
-			goWidth = (int) ((currentDuration - lrcBean.startTime) * 1.0 / (maxDuration - lrcBean.startTime) * lrcTextW);
+			goWidth = ((currentDuration - lrcBean.startTime) * 1.0f / (maxDuration - lrcBean.startTime) * lrcTextW);
 		} else {
-			goWidth = (int) ((currentDuration - lrcBean.startTime) * 1.0 / (lrcBean.endTime - lrcBean.startTime) * lrcTextW);
+			goWidth = ((currentDuration - lrcBean.startTime) * 1.0f / (lrcBean.endTime - lrcBean.startTime) * lrcTextW);
 		}
 		return goWidth;
 	}
 
 	// 画歌词卡拉OK
 	private void canvasLrcBitmap(Canvas canvas, LrcBean lrcBean, int currentPosition) {
+		canvas.save();
 		// 第一条歌词偏移出去的高度 只有第一条是多行的情况才会有偏移
 		float firstItemOffset = (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() + (lrcBean.lrcTranslateLineList == null ? 0 : lrcBean.lrcTranslateLineList.size()) - 1)
 				* lrcTextH / 2;
@@ -473,44 +478,68 @@ public class LrcView extends View {
 		// 歌词宽度
 		float lrcTextW = lrcPaint.measureText(lrcBean.lrc);
 		// 卡拉OK移动的距离
-		int goWidth = calculateGoWidth(lrcBean, lrcTextW, currentPosition);
+		float goWidth = calculateGoWidth(lrcBean, lrcTextW, currentPosition);
 		// 单行歌词有换行的歌词判断
 		if (list != null && list.size() > 1) {
 			if (goWidth > 0) {
 				if (goWidth >= (currentBreakLineIndex + 1) * lrcMaxLength) {
 					// 计算折行歌词条目
-					currentBreakLineIndex = goWidth / lrcMaxLength;
+					currentBreakLineIndex = (int) (goWidth / lrcMaxLength);
 				}
 				if (currentBreakLineIndex > 0) {// 绘制已经播放的卡拉OK模式歌词
 					for (int j = 0; j < currentBreakLineIndex; j++) {
 						lrcPaint.setColor(playLrcColor);
+						lrcPaint.setAlpha(currentAlpha);
 						canvas.drawText(list.get(j), (float) getMeasuredWidth() / 2,
 								(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) + j * lrcTextH - firstItemOffset, lrcPaint);
 					}
 				}
 				if (goWidth - currentBreakLineIndex * lrcMaxLength <= 0) return;
-				Bitmap textBitmap = Bitmap.createBitmap((goWidth - currentBreakLineIndex * lrcMaxLength), (int) (lrcTextH + lrcPadding / 2), Bitmap.Config.ARGB_8888);
-				Canvas textCanvas = new Canvas(textBitmap);
-				textCanvas.drawText(list.get(currentBreakLineIndex), lrcPaint.measureText(list.get(currentBreakLineIndex)) / 2, lrcTextH, lrcPaint);
-				canvas.drawBitmap(textBitmap, (getMeasuredWidth() - lrcPaint.measureText(list.get(currentBreakLineIndex))) / 2,
+				// Bitmap textBitmap = Bitmap.createBitmap((goWidth - currentBreakLineIndex *
+				// lrcMaxLength), (int) (lrcTextH + lrcPadding / 2), Bitmap.Config.ARGB_8888);
+				// Canvas textCanvas = new Canvas(textBitmap);
+				// textCanvas.drawText(list.get(currentBreakLineIndex),
+				// lrcPaint.measureText(list.get(currentBreakLineIndex)) / 2, lrcTextH,
+				// lrcPaint);
+				// canvas.drawBitmap(textBitmap, (getMeasuredWidth() -
+				// lrcPaint.measureText(list.get(currentBreakLineIndex))) / 2,
+				// (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent +
+				// calculateOffset(currentPosition) - lrcTextH + currentBreakLineIndex *
+				// lrcTextH - firstItemOffset,
+				// null);
+				// textBitmap.recycle();
+				// 裁剪一个矩形用来绘制已经唱的歌词
+				canvas.clipRect((getMeasuredWidth() - lrcPaint.measureText(list.get(currentBreakLineIndex))) / 2,
 						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - lrcTextH + currentBreakLineIndex * lrcTextH - firstItemOffset,
-						null);
-				textBitmap.recycle();
+						(getMeasuredWidth() - lrcPaint.measureText(list.get(currentBreakLineIndex))) / 2 + (goWidth - currentBreakLineIndex * lrcMaxLength),
+						(float) getMeasuredHeight() / 2 + lrcTextH / 2 + calculateOffset(currentPosition) + currentBreakLineIndex * lrcTextH - firstItemOffset);
+				canvas.drawText(list.get(currentBreakLineIndex), (float) getMeasuredWidth() / 2,
+						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) + currentBreakLineIndex * lrcTextH - firstItemOffset, lrcPaint);
 			}
 		} else {
 			if (goWidth > 0) {
-				Bitmap textBitmap = Bitmap.createBitmap(goWidth, (int) (lrcTextH + lrcPadding / 2), Bitmap.Config.ARGB_8888);
-				Canvas textCanvas = new Canvas(textBitmap);
-				textCanvas.drawText(lrcBean.lrc, lrcTextW / 2, lrcTextH, lrcPaint);
-				canvas.drawBitmap(textBitmap, (getMeasuredWidth() - lrcTextW) / 2,
-						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - lrcTextH - firstItemOffset, null);
-				textBitmap.recycle();
+				// Bitmap textBitmap = Bitmap.createBitmap(goWidth, (int) (lrcTextH + lrcPadding
+				// / 2), Bitmap.Config.ARGB_8888);
+				// Canvas textCanvas = new Canvas(textBitmap);
+				// textCanvas.drawText(lrcBean.lrc, lrcTextW / 2, lrcTextH, lrcPaint);
+				// canvas.drawBitmap(textBitmap, (getMeasuredWidth() - lrcTextW) / 2,
+				// (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent +
+				// calculateOffset(currentPosition) - lrcTextH - firstItemOffset, null);
+				// textBitmap.recycle();
+				// 裁剪一个矩形用来绘制已经唱的歌词
+				canvas.clipRect((getMeasuredWidth() - lrcTextW) / 2,
+						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - lrcTextH - firstItemOffset,
+						(getMeasuredWidth() - lrcTextW) / 2 + goWidth, (float) getMeasuredHeight() / 2 + lrcTextH / 2 + calculateOffset(currentPosition) - firstItemOffset);
+				canvas.drawText(lrcBean.lrc, (float) getMeasuredWidth() / 2,
+						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - firstItemOffset, lrcPaint);
 			}
 		}
+		canvas.restore();
 	}
 
 	// 画音译歌词卡拉OK
 	private void canvasTranslateLrcLrcBitmap(Canvas canvas, LrcBean lrcBean, int currentPosition) {
+		canvas.save();
 		// 设置卡拉OK模式颜色
 		lrcTranslatePaint.setColor(playLrcColor);
 		// 同步透明度
@@ -524,41 +553,46 @@ public class LrcView extends View {
 		// 歌词宽度
 		float lrcTextW = lrcTranslatePaint.measureText(lrcBean.translateLrc);
 		// 卡拉OK移动的距离
-		int goWidth = calculateGoWidth(lrcBean, lrcTextW, currentPosition);
+		float goWidth = calculateGoWidth(lrcBean, lrcTextW, currentPosition);
 		// 单行歌词有换行的歌词判断
 		if (list.size() > 1) {
 			if (goWidth > 0) {
 				if (goWidth >= (currentBreakLineIndex + 1) * lrcMaxLength) {
 					// 计算折行歌词条目
-					currentBreakLineIndex = goWidth / lrcMaxLength;
+					currentBreakLineIndex = (int) (goWidth / lrcMaxLength);
 				}
 				if (currentBreakLineIndex > 0) {// 绘制已经播放的卡拉OK模式歌词
 					for (int j = 0; j < currentBreakLineIndex; j++) {
 						lrcTranslatePaint.setColor(playLrcColor);
+						lrcTranslatePaint.setAlpha(currentAlpha);
 						canvas.drawText(list.get(j), (float) getMeasuredWidth() / 2, (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition)
 								+ j * lrcTextH - firstItemOffset + lrcBean.lrcBreakLineList.size() * lrcTextH, lrcTranslatePaint);
 					}
 				}
-				if (goWidth - currentBreakLineIndex * lrcMaxLength <= 0) return;
-				Bitmap textBitmap = Bitmap.createBitmap((goWidth - currentBreakLineIndex * lrcMaxLength), (int) (lrcTextH + lrcPadding / 2), Bitmap.Config.ARGB_8888);
-				Canvas textCanvas = new Canvas(textBitmap);
-				textCanvas.drawText(list.get(currentBreakLineIndex), lrcTranslatePaint.measureText(list.get(currentBreakLineIndex)) / 2, lrcTextH, lrcTranslatePaint);
-				canvas.drawBitmap(textBitmap, (getMeasuredWidth() - lrcTranslatePaint.measureText(list.get(currentBreakLineIndex))) / 2,
+				// 裁剪一个矩形用来绘制已经唱的歌词
+				canvas.clipRect((getMeasuredWidth() - lrcTranslatePaint.measureText(list.get(currentBreakLineIndex))) / 2,
 						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - lrcTextH + currentBreakLineIndex * lrcTextH - firstItemOffset
 								+ (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH),
-						null);
-				textBitmap.recycle();
+						(getMeasuredWidth() - lrcTranslatePaint.measureText(list.get(currentBreakLineIndex))) / 2 + (goWidth - currentBreakLineIndex * lrcMaxLength),
+						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) + currentBreakLineIndex * lrcTextH - firstItemOffset
+								+ (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH));
+				canvas.drawText(list.get(currentBreakLineIndex), (float) getMeasuredWidth() / 2, (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent
+						+ calculateOffset(currentPosition) + currentBreakLineIndex * lrcTextH - firstItemOffset + (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH),
+						lrcTranslatePaint);
 			}
 		} else {
 			if (goWidth > 0) {
-				Bitmap textBitmap = Bitmap.createBitmap(goWidth, (int) (lrcTextH + lrcPadding / 2), Bitmap.Config.ARGB_8888);
-				Canvas textCanvas = new Canvas(textBitmap);
-				textCanvas.drawText(lrcBean.translateLrc, lrcTextW / 2, lrcTextH, lrcTranslatePaint);
-				canvas.drawBitmap(textBitmap, (getMeasuredWidth() - lrcTextW) / 2, (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition)
-						- lrcTextH - firstItemOffset + (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH), null);
-				textBitmap.recycle();
+				// 裁剪一个矩形用来绘制已经唱的歌词
+				canvas.clipRect((getMeasuredWidth() - lrcTextW) / 2,
+						(float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - lrcTextH - firstItemOffset
+								+ (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH),
+						(getMeasuredWidth() - lrcTextW) / 2 + goWidth, (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - firstItemOffset
+								+ (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH));
+				canvas.drawText(list.get(currentBreakLineIndex), (float) getMeasuredWidth() / 2, (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent
+						+ calculateOffset(currentPosition) - firstItemOffset + (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH), lrcTranslatePaint);
 			}
 		}
+		canvas.restore();
 	}
 
 	// 绘制卡拉OK样式
@@ -602,8 +636,8 @@ public class LrcView extends View {
 					lrcTranslatePaint.setAlpha((int) (255 - (mOffset - lrcBeans.get(i).offset) * 255 / (height / 2 + lrcBeans.get(1).offset / 2)));
 				} else {
 					// 当前拖动位置下半部分透明度设置
-					lrcPaint.setAlpha((int) ((mOffset - lrcBeans.get(i).offset) * 255 / (height / 2 + lrcBeans.get(1).offset / 2)));
-					lrcTranslatePaint.setAlpha((int) ((mOffset - lrcBeans.get(i).offset) * 255 / (height / 2 + lrcBeans.get(1).offset / 2)));
+					lrcPaint.setAlpha((int) (255 + (mOffset - lrcBeans.get(i).offset) * 255 / (height / 2 + lrcBeans.get(1).offset / 2)));
+					lrcTranslatePaint.setAlpha((int) (255 + (mOffset - lrcBeans.get(i).offset) * 255 / (height / 2 + lrcBeans.get(1).offset / 2)));
 				}
 				// 设置中心线上半部分高亮
 				for (int j = position - heightLightItems / 2; j < position; j++) {
@@ -621,8 +655,8 @@ public class LrcView extends View {
 				}
 			} else {// 开始播放时上半部分没有内容情况
 				// 设置当前位置下半部分透明度
-				lrcPaint.setAlpha((int) ((mOffset - lrcBeans.get(i).offset) * 255 / (height / 2 + lrcBeans.get(1).offset / 2)));
-				lrcTranslatePaint.setAlpha((int) ((mOffset - lrcBeans.get(i).offset) * 255 / (height / 2 + lrcBeans.get(1).offset / 2)));
+				lrcPaint.setAlpha((int) (255 + (mOffset - lrcBeans.get(i).offset) * 255 / (height / 2 + lrcBeans.get(1).offset / 2)));
+				lrcTranslatePaint.setAlpha((int) (255 + (mOffset - lrcBeans.get(i).offset) * 255 / (height / 2 + lrcBeans.get(1).offset / 2)));
 				// 设置首位置高亮
 				for (int j = 0; j < heightLightItems / 2; j++) {
 					if (i == j) {
