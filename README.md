@@ -4,9 +4,9 @@
 ## 使用方法
 
     lrcView.setLrc(lrc);
-		lrcView.setMaxDuration(maxDuration);
+    lrcView.setMaxDuration(maxDuration);
     lrcView.setCurrentDuration(currentDuration);
-		lrcView.setSeekListener(this);
+    lrcView.setSeekListener(this);
     
     @Override 
     public void seekToDuration(LrcView lrcView, long duration) {
@@ -41,6 +41,8 @@
 
 
 ## 截图
+![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc7.jpg)
+
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc1.jpg)
 
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc2.jpg)
