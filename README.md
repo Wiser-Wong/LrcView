@@ -41,16 +41,23 @@
 
 
 ## 截图
+### 正常歌词
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc7.jpg)
 
+### 音译歌词
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc1.jpg)
 
+### 按下显示播放线
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc2.jpg)
 
+### 滚动歌词显示效果
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc3.jpg)
 
+### 无歌词效果
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc4.jpg)
 
+### 按下播放线 播放按钮与时间显示位置调换
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc5.jpg)
 
+### 折行歌词显示效果
 ![images](https://github.com/Wiser-Wong/LrcView/blob/master/images/lrc6.jpg)
