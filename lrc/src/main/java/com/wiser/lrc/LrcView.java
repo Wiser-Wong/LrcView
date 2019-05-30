@@ -497,6 +497,7 @@ public class LrcView extends View {
 					// 计算折行歌词条目
 					currentBreakLineIndex = (int) (goWidth / lrcMaxLength);
 				}
+				if (currentBreakLineIndex >= list.size()) return;
 				if (currentBreakLineIndex > 0) {// 绘制已经播放的卡拉OK模式歌词
 					for (int j = 0; j < currentBreakLineIndex; j++) {
 						lrcPaint.setColor(playLrcColor);
@@ -574,6 +575,7 @@ public class LrcView extends View {
 					// 计算折行歌词条目
 					currentBreakLineIndex = (int) (goWidth / lrcMaxLength);
 				}
+				if (currentBreakLineIndex >= list.size()) return;
 				if (currentBreakLineIndex > 0) {// 绘制已经播放的卡拉OK模式歌词
 					for (int j = 0; j < currentBreakLineIndex; j++) {
 						lrcTranslatePaint.setColor(playLrcColor);
@@ -601,8 +603,8 @@ public class LrcView extends View {
 								+ (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH),
 						(getMeasuredWidth() - lrcTextW) / 2 + goWidth, (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition) - firstItemOffset
 								+ (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH));
-				canvas.drawText(list.get(currentBreakLineIndex), (float) getMeasuredWidth() / 2, (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent
-						+ calculateOffset(currentPosition) - firstItemOffset + (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH), lrcTranslatePaint);
+				canvas.drawText(lrcBean.translateLrc, (float) getMeasuredWidth() / 2, (float) getMeasuredHeight() / 2 + fontMetrics.bottom + fontMetrics.descent + calculateOffset(currentPosition)
+						- firstItemOffset + (lrcBean.lrcBreakLineList == null ? 0 : lrcBean.lrcBreakLineList.size() * lrcTextH), lrcTranslatePaint);
 			}
 		}
 		canvas.restore();
