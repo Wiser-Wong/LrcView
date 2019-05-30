@@ -17,6 +17,7 @@
         android:layout_height="match_parent"
         app:lrcColor="#ffffff"
         app:lrcEmptyLrcText="加载失败，歌词未显示"
+        app:lrcHeightLightItems="1"
         app:lrcIsDashLine="true"
         app:lrcLeftLineSrc="@drawable/line"
         app:lrcLimitLines="11"
@@ -26,17 +27,16 @@
         app:lrcMode="KARAOKE"
         app:lrcPlayColor="#ffff00"
         app:lrcPlaySrc="@mipmap/lrc_play"
+        app:lrcRightLineSrc="@drawable/line"
         app:lrcTextSize="15sp"
         app:lrcTimeDirectionMode="LEFT"
         app:lrcTimeLineColor="#CAFF70"
         app:lrcTimeLineHeight="1dp"
         app:lrcTimeLineLength="40dp"
-        app:lrcRightLineSrc="@drawable/line"
         app:lrcTimeLinePadding="10dp"
         app:lrcTimeTextColor="#ffff00"
         app:lrcTimeTextSize="12sp"
         app:lrcTranslateColor="#CCCCCC"
-        app:lrcTranslateIsDrawColor="true"
-        app:lrcHeightLightItems="1"/>
+        app:lrcTranslateIsDrawColor="true" />
 
 </FrameLayout>

@@ -307,11 +307,13 @@ public class LrcView extends View {
 
 	// 设置歌词
 	public void setLrc(String lrc) {
-		lrcBeans = LrcParseTool.parseLrc(lrc);
+		if (this.lrcBeans != null && this.lrcBeans.size() > 0) this.lrcBeans.clear();
+		this.lrcBeans = LrcParseTool.parseLrc(lrc);
 	}
 
 	// 设置歌词集合
 	public void setLrcBeans(List<LrcBean> lrcBeans) {
+		if (this.lrcBeans != null && this.lrcBeans.size() > 0) this.lrcBeans.clear();
 		this.lrcBeans = lrcBeans;
 	}
 
@@ -504,8 +506,10 @@ public class LrcView extends View {
 					}
 				}
 				if (goWidth - currentBreakLineIndex * lrcMaxLength <= 0) return;
-				// Bitmap textBitmap = Bitmap.createBitmap((goWidth - currentBreakLineIndex *
-				// lrcMaxLength), (int) (lrcTextH + lrcPadding / 2), Bitmap.Config.ARGB_8888);
+				// Bitmap textBitmap = Bitmap.createBitmap((int) (goWidth -
+				// currentBreakLineIndex * lrcMaxLength) > 0 ? (int) (goWidth -
+				// currentBreakLineIndex * lrcMaxLength) : 1,
+				// (int) (lrcTextH + lrcPadding / 2), Bitmap.Config.ARGB_8888);
 				// Canvas textCanvas = new Canvas(textBitmap);
 				// textCanvas.drawText(list.get(currentBreakLineIndex),
 				// lrcPaint.measureText(list.get(currentBreakLineIndex)) / 2, lrcTextH,
@@ -527,8 +531,8 @@ public class LrcView extends View {
 			}
 		} else {
 			if (goWidth > 0) {
-				// Bitmap textBitmap = Bitmap.createBitmap(goWidth, (int) (lrcTextH + lrcPadding
-				// / 2), Bitmap.Config.ARGB_8888);
+				// Bitmap textBitmap = Bitmap.createBitmap(goWidth > 0 ? (int) goWidth : 1,
+				// (int) (lrcTextH + lrcPadding / 2), Bitmap.Config.ARGB_8888);
 				// Canvas textCanvas = new Canvas(textBitmap);
 				// textCanvas.drawText(lrcBean.lrc, lrcTextW / 2, lrcTextH, lrcPaint);
 				// canvas.drawBitmap(textBitmap, (getMeasuredWidth() - lrcTextW) / 2,
