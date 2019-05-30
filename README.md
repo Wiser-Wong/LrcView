@@ -3,7 +3,10 @@
 
 ## 使用方法
 
+    //设置歌词字符串
     lrcView.setLrc(lrc);
+    //或者设置歌词集合
+    lrcView.setLrcBeans(lrcBeans);
     lrcView.setMaxDuration(maxDuration);
     lrcView.setCurrentDuration(currentDuration);
     lrcView.setSeekListener(this);
